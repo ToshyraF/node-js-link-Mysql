@@ -10,6 +10,12 @@ var connection = mysql.createConnection({
 app.use(express.static(__dirname+"/view" ));
 app.get('/',function(req,res){
     res.render('index');
+
+});
+app.get('/data',function(req,res){
+    res.writeHead(200, {"Content-Type":"text/plain"});
+    res.write('hot');
+    res.end();
 });
 function selectAll(){
 connection.query('SELECT * from student', function(err, rows, fields) {

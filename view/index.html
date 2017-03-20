@@ -1,7 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script>document.createElement("myHero")</script>
+  	<script>
+  		function ajaxGet(){
+	  	xmlhttp = new XMLHttpRequest();
+	   	xmlhttp.onreadystatechange=function(){
+	         if (xmlhttp.readyState==4 && xmlhttp.status==200){
+	            document.getElementById("txtHint").innerHTML =alert(this.responseText); //callback
+	         }
+	   	}
+	   	xmlhttp.open("GET","http://localhost:3000/data", true);
+	   	xmlhttp.send(); //request from client to server for get data
+	   	}
+	   	window.onload = function(){ ajaxGet() };
+  	</script>
   <style>
   myHero {
       display: block;
@@ -14,7 +26,7 @@
 <body>
 
 <h1>A Heading</h1>
-<myHero>My Hero Element</myHero>
+<div>My Hero Element: <div id="txtHint"></div></div>
 
 </body>
 </html>
