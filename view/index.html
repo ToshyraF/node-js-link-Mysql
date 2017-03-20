@@ -6,7 +6,7 @@
 	  	xmlhttp = new XMLHttpRequest();
 	   	xmlhttp.onreadystatechange=function(){
 	         if (xmlhttp.readyState==4 && xmlhttp.status==200){
-	            document.getElementById("txtHint").innerHTML =alert(this.responseText); //callback
+	            document.getElementById("txtHint").innerHTML =console.log(JSON.parse(this.responseText)); //callback
 	         }
 	   	}
 	   	xmlhttp.open("GET","http://localhost:3000/data", true);

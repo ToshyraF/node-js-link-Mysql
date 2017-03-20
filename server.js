@@ -11,17 +11,20 @@ app.use(express.static(__dirname+"/view" ));
 app.get('/',function(req,res){
     res.render('index');
 
-});
+}); 
+//var requestData= { "cmd" : "do something" },{ "cmd" : "do" };
 app.get('/data',function(req,res){
-    res.writeHead(200, {"Content-Type":"text/plain"});
-    res.write('hot');
-    res.end();
+    //res.writeHead(200, {"Content-Type":"text/plain"});
+    res.setHeader('Content-Type', 'application/json');
+    res.end(json);
+    //res.write(JSON.stringify(selectAll()));
+    //res.end();
 });
+var json='';
 function selectAll(){
 connection.query('SELECT * from student', function(err, rows, fields) {
   if (err) throw err;
-
-  console.log('The solution is: ', rows);
+  json=JSON.stringify(rows);
 });
 }
 function insertData(){
@@ -31,7 +34,8 @@ function insertData(){
         console.log('success');
         });
 }
-// connection.connect();
+ connection.connect();
 // insertData();
-//connection.end();
+selectAll();
+connection.end();
 app.listen(3000);
