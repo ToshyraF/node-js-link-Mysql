@@ -6,7 +6,12 @@
 	  	xmlhttp = new XMLHttpRequest();
 	   	xmlhttp.onreadystatechange=function(){
 	         if (xmlhttp.readyState==4 && xmlhttp.status==200){
-	            document.getElementById("txtHint").innerHTML =console.log(JSON.parse(this.responseText)); //callback
+	         	var myObj = JSON.parse(this.responseText,function(key,value){
+	         		//console.log(key);
+	         		return value;
+	         	});
+	            document.getElementById("txtHint").innerHTML =myObj[0].keys; //callback
+	         	console.log(Object.keys(myObj[0]));//get attribute of database
 	         }
 	   	}
 	   	xmlhttp.open("GET","http://localhost:3000/data", true);

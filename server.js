@@ -12,14 +12,15 @@ app.get('/',function(req,res){
     res.render('index');
 
 }); 
-//var requestData= { "cmd" : "do something" },{ "cmd" : "do" };
 app.get('/data',function(req,res){
-    //res.writeHead(200, {"Content-Type":"text/plain"});
     res.setHeader('Content-Type', 'application/json');
     res.end(json);
-    //res.write(JSON.stringify(selectAll()));
     //res.end();
+    //connection.connect();
+    //insertData();
+    //connection.end();
 });
+
 var json='';
 function selectAll(){
 connection.query('SELECT * from student', function(err, rows, fields) {
@@ -34,8 +35,8 @@ function insertData(){
         console.log('success');
         });
 }
- connection.connect();
+connection.connect();
 // insertData();
 selectAll();
-connection.end();
+//connection.end();
 app.listen(3000);
