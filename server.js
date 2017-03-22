@@ -14,11 +14,17 @@ app.get('/',function(req,res){
 }); 
 app.get('/data',function(req,res){
     res.setHeader('Content-Type', 'application/json');
+    console.log(res)
     res.end(json);
     //res.end();
     //connection.connect();
     //insertData();
     //connection.end();
+});
+app.post('/dataa',function(req,res){
+    var obj = {};
+    console.log('body: ' + JSON.stringify(req.body));
+    res.send(req.body);
 });
 
 var json='';

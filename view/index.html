@@ -2,22 +2,42 @@
 <html>
 <head>
   	<script>
-  		function ajaxGet(){
-	  	xmlhttp = new XMLHttpRequest();
-	   	xmlhttp.onreadystatechange=function(){
-	         if (xmlhttp.readyState==4 && xmlhttp.status==200){
-	         	var myObj = JSON.parse(this.responseText,function(key,value){
-	         		//console.log(key);
-	         		return value;
-	         	});
-	            document.getElementById("txtHint").innerHTML =myObj[0].keys; //callback
-	         	console.log(Object.keys(myObj[0]));//get attribute of database
-	         }
+  		function ajaxGet(path){
+		  	xmlhttp = new XMLHttpRequest();
+		   	xmlhttp.onreadystatechange=function(){
+		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		         	var myObj = JSON.parse(this.responseText);
+		         	var temp  = "<tr>";
+		         	for(var i=0;i<Object.keys(myObj[0]).length;i++){
+		         		temp+="<td style='width: 100px; color: red;'>"+Object.keys(myObj[0])[i]+"</td>"
+		         	}
+		         	temp+="</tr>"
+		         	for(var i=0;i<myObj.length;i++){
+		         	 	temp+="<tr>"
+		         	 	for (var key in myObj[i]){
+		         	 		temp+="<td style='width: 100px; color: red;'>"+myObj[i][key]+"</td>"
+		         			console.log(key)
+		         		}	         	
+		         		temp+="</tr>"
+		         	}
+		            document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
+		         	console.log(myObj[0]["email"]);//get attribute of database
+
+		         }
+		   	}
+		   	xmlhttp.open("GET","http://localhost:3000"+path, true);
+		   	xmlhttp.send(); //request from client to server for get data
 	   	}
-	   	xmlhttp.open("GET","http://localhost:3000/data", true);
-	   	xmlhttp.send(); //request from client to server for get data
+	   	var ja=[
+        {
+            "text" : "Chip Bags"
+        }];
+	   	function ajaxPost(path){
+		  	xmlhttp = new XMLHttpRequest();
+		   	xmlhttp.open("POST","http://localhost:3000"+path,"asd",true);
+		   	xmlhttp.send(); //request from client to server for get data
 	   	}
-	   	window.onload = function(){ ajaxGet() };
+	   	//window.onload = function(){ ajaxGet("/data") };
   	</script>
   <style>
   myHero {
@@ -31,7 +51,7 @@
 <body>
 
 <h1>A Heading</h1>
-<div>My Hero Element: <div id="txtHint"></div></div>
-
+<div><div id="buildTable"></div></div>
+<button onclick="ajaxPost('/dataa')">hot</button>
 </body>
 </html>
