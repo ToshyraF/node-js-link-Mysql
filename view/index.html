@@ -7,6 +7,7 @@
 		   	xmlhttp.onreadystatechange=function(){
 		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		         	var myObj = JSON.parse(this.responseText);
+		         	console.log(myObj);
 		         	var temp  = "<tr>";
 		         	for(var i=0;i<Object.keys(myObj[0]).length;i++){
 		         		temp+="<td style='width: 100px; color: red;'>"+Object.keys(myObj[0])[i]+"</td>"
@@ -16,28 +17,38 @@
 		         	 	temp+="<tr>"
 		         	 	for (var key in myObj[i]){
 		         	 		temp+="<td style='width: 100px; color: red;'>"+myObj[i][key]+"</td>"
-		         			console.log(key)
+		         			//console.log(key)
 		         		}	         	
-		         		temp+="</tr>"
+		         		temp+='<td><button onclick="deleteR('+myObj[i][Object.keys(myObj[0])[0]]+')">Delete</button></td></tr>'
 		         	}
-		            document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
-		         	console.log(myObj[0]["email"]);//get attribute of database
+		            document.getElementById("buildTable").innerHTML ="<table id='myTable'>"+temp+"<tr id='add'></tr></table>"; //callback
+		         	// console.log(myObj[0]["email"]);//get attribute of database
 
 		         }
 		   	}
 		   	xmlhttp.open("GET","http://localhost:3000"+path, true);
 		   	xmlhttp.send(); //request from client to server for get data
 	   	}
-	   	var ja=[
-        {
-            "text" : "Chip Bags"
-        }];
 	   	function ajaxPost(path){
 		  	xmlhttp = new XMLHttpRequest();
-		   	xmlhttp.open("POST","http://localhost:3000"+path,"asd",true);
+		  	xmlhttp.onreadystatechange=function(){
+		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		         		setTimeout("ajaxGet('/data')",100);
+		         	}
+		         }
+		   	xmlhttp.open("POST","http://localhost:3000"+path,true);
+		   	xmlhttp.setRequestHeader("Content-type","appication/json");
 		   	xmlhttp.send(); //request from client to server for get data
 	   	}
-	   	//window.onload = function(){ ajaxGet("/data") };
+	   	function deleteR(path){
+	 		ajaxPost("/delete/"+path)
+	   	}
+	   	function addValues(){
+	   		document.getElementById("add").innerHTML ="<td style='width: 100px; color: red;'>mks</td><td style='width: 100px; color: red;'>mks</td><td style='width: 100px; color: red;'>mks</td></tr>"
+	   		ajaxPost("/add")	
+	   	}
+	   	//var myVar = setInterval(, 1000);
+	   	// window.onload = function(){ ajaxGet("/data") };
   	</script>
   <style>
   myHero {
@@ -52,6 +63,7 @@
 
 <h1>A Heading</h1>
 <div><div id="buildTable"></div></div>
-<button onclick="ajaxPost('/dataa')">hot</button>
+<button onclick="ajaxGet('/data')">show</button>
+<button onclick="addValues()">add</button> <!--param id=8 table=1  -->
 </body>
 </html>
