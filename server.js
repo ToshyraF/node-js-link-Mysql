@@ -1,12 +1,12 @@
 var express    = require('express');
 var app        = express();
 var mysql      = require('mysql');
-var connection = mysql.createConnection({
-  host     : '127.0.0.1',
-  user     : 'root',
-  password : '1234',
-  database : 'world'
-});
+// var connection = mysql.createConnection({
+//       host     : '127.0.0.1',
+//       user     : 'root',
+//       password : '1234',
+//       database : 'world'   
+//     });
 app.use(express.static(__dirname+"/view" ));
 // app.use(express.bodyParser());
 app.get('/',function(req,res){
@@ -15,28 +15,16 @@ app.get('/',function(req,res){
 }); 
 app.get('/data',function(req,res){
     res.setHeader('Content-Type', 'application/json');
-    //selectAll()
     res.end(json);
-    //res.end();
-    //connection.connect();
-    //insertData();
-    //connection.end();
 });
-app.get('/dog?',function(req,res){
+app.post('/query/:key?',function(req,res){
    console.log(req.query );
-});
-app.post('/data/:key',function(req,res){
-    res.setHeader('Content-Type', 'application/json');
-    // connection.end();
-    // connection = mysql.createConnection({
-    //   host     : '127.0.0.1',
-    //   user     : 'root',
-    //   password : '1234',
-    //   database : req.params.key
-    // });
-    // connection.connect();
-    selectAll();
-    res.end(json);
+   res.setHeader('Content-Type', 'application/json');
+   connectdatabase(req.params.key);
+   selectAll(req.query.table);
+   // var myObj = JSON.stringify(req.query);
+   // console.log(myobj);
+   res.send();
 });
 app.post('/delete/:key',function(req,res){
     console.log(req.params.key);
@@ -44,16 +32,18 @@ app.post('/delete/:key',function(req,res){
     selectAll();
     res.end(json);
 });
-
-app.post('/query?',function(req,res){
-    var myObj = JSON.parse(req.query.table);
-    selectAll2(myObj);
-    res.end(json);
-});
-
+function connectdatabase(name){
+  connection = mysql.createConnection({
+      host     : '127.0.0.1',
+      user     : 'root',
+      password : '1234',
+      database : name
+    });
+    connection.connect();
+}
 var json='';
-function selectAll(){
-connection.query('SELECT * from city ', function(err, rows, fields) {
+function selectAll(key){
+connection.query('SELECT * from '+key, function(err, rows, fields) {
   if (err) throw err;
   json=JSON.stringify(rows);
 });
@@ -78,7 +68,7 @@ function deleteData(data){
         console.log('success');
       });
 }
-connection.connect();
+// connection.connect();
 // selectAll()
 // insertData();
 //connection.end();

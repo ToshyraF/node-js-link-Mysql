@@ -40,26 +40,26 @@
 		   	xmlhttp.setRequestHeader("Content-type","appication/json");
 		   	
 		   	xmlhttp.send(); //request from client to server for get data
-	   	}
-	   	var myObj = [{ "table":"city" },{ "table":"country" }];
-			var myJSON = JSON.stringify(myObj);
+	   	}			
 	   	function deleteR(path){
 	 		ajaxPost("/delete/"+path)
 	   	}
-	 	function query(){
-	 		ajaxPost("/query/?table="+myJSON)
-	 	}
 	   	function submit(){
-	   		document.getElementById("formA").submit();
-	   		//ajaxPost();
-	   		var g=document.getElementById("formA").value();
-	   		console.log(g);
+	   		var ele = document.getElementsByClassName("query");
+	   		var temp='';
+	   		console.log(ele.length);
+	   		for(var i=0;i<ele.length;i++){
+	   			if(i!=(ele.length-1)){
+	   				temp +=ele[i].name+"="+ele[i].value+"&"
+	   			}
+	   			else{
+	   				temp +=ele[i].name+"="+ele[i].value	
+	   			}
+	   			
+	   		}
+	   		console.log(temp);
+	   		ajaxPost("/query/world?"+temp);
 	   	}
-	   	function addValues(){
-	   		document.getElementById("add").innerHTML ="<td style='width: 100px; color: red;'>mks</td><td style='width: 100px; color: red;'>mks</td><td style='width: 100px; color: red;'>mks</td></tr>"
-	   		ajaxPost("/add")	
-	   	}
-
 	   	//var myVar = setInterval(, 1000);
 	   	// window.onload = function(){ ajaxGet("/data") };
   	</script>
@@ -75,17 +75,16 @@
 <body>
 
 <h1>A Heading</h1>
-<form id="formA">
-  First name:<br>
-  <input type="text" name="firstname" value="Mickey">
+<form id="formA" action="/as">
+  Table :<br>
+  <input type="text" class="query" name="table" value="Mickey">
   <br>
-  Last name:<br>
-  <input type="text" name="lastname" value="Mouse">
+  <!-- Last name:<br> -->
+  <!-- <input type="text" class="query"  name="lastname" value="Mouse"> -->
   <br><br>
-  <input type="submit" value="Submit" onclick="submit()">
-</form> 
+</form>
+<input type="submit" value="Submit" onclick="submit()">
 <div><div id="buildTable"></div></div>
-<button onclick="ajaxPost('/data/school')">show</button>
 <button onclick="query()">Query</button> <!--param id=8 table=1  -->
 </body>
 </html>
