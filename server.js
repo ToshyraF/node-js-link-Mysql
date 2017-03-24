@@ -17,10 +17,10 @@ app.get('/data',function(req,res){
     res.setHeader('Content-Type', 'application/json');
     res.end(json);
 });
-app.post('/query/:key?',function(req,res){
+app.post('/query?',function(req,res){
    console.log(req.query );
    res.setHeader('Content-Type', 'application/json');
-   connectdatabase(req.params.key);
+   connectdatabase(req.query.database);
    selectAll(req.query.table);
    // var myObj = JSON.stringify(req.query);
    // console.log(myobj);
