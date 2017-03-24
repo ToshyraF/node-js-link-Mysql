@@ -21,7 +21,7 @@
 		         		}	         	
 		         		temp+='<td><button onclick="deleteR('+myObj[i][Object.keys(myObj[0])[0]]+')">Delete</button></td></tr>'
 		         	}
-		            document.getElementById("buildTable").innerHTML ="<table id='myTable'>"+temp+"<tr id='add'></tr></table>"; //callback
+		            document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
 		         	// console.log(myObj[0]["email"]);//get attribute of database
 
 		         }
@@ -44,7 +44,16 @@
 	   	var myObj = [{ "table":"city" },{ "table":"country" }];
 			var myJSON = JSON.stringify(myObj);
 	   	function deleteR(path){
-	 		ajaxPost("/delete/"+path+"?table="+myJSON)
+	 		ajaxPost("/delete/"+path)
+	   	}
+	 	function query(){
+	 		ajaxPost("/query/?table="+myJSON)
+	 	}
+	   	function submit(){
+	   		document.getElementById("formA").submit();
+	   		//ajaxPost();
+	   		var g=document.getElementById("formA").value();
+	   		console.log(g);
 	   	}
 	   	function addValues(){
 	   		document.getElementById("add").innerHTML ="<td style='width: 100px; color: red;'>mks</td><td style='width: 100px; color: red;'>mks</td><td style='width: 100px; color: red;'>mks</td></tr>"
@@ -66,17 +75,17 @@
 <body>
 
 <h1>A Heading</h1>
-<form >
+<form id="formA">
   First name:<br>
   <input type="text" name="firstname" value="Mickey">
   <br>
   Last name:<br>
   <input type="text" name="lastname" value="Mouse">
   <br><br>
-  <input type="submit" value="Submit" >
+  <input type="submit" value="Submit" onclick="submit()">
 </form> 
 <div><div id="buildTable"></div></div>
 <button onclick="ajaxPost('/data/school')">show</button>
-<button onclick="addValues()">add</button> <!--param id=8 table=1  -->
+<button onclick="query()">Query</button> <!--param id=8 table=1  -->
 </body>
 </html>

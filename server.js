@@ -22,12 +22,8 @@ app.get('/data',function(req,res){
     //insertData();
     //connection.end();
 });
-app.post('/dog?',function(req,res){
+app.get('/dog?',function(req,res){
    console.log(req.query );
-    //res.end();
-    //connection.connect();
-    //insertData();
-    //connection.end();
 });
 app.post('/data/:key',function(req,res){
     res.setHeader('Content-Type', 'application/json');
@@ -42,22 +38,16 @@ app.post('/data/:key',function(req,res){
     selectAll();
     res.end(json);
 });
-app.post('/delete/:key?',function(req,res){
-    console.log(req.query );
-    var myObj = JSON.parse(req.query.table);
-    //console.log(myObj[0]["table"]);
-    // deleteData(req.params.key)
-    // res.setHeader('Content-Type', 'application/json');
-    //selectAll2(myObj);
-    res.end();
-    // res.end()
-});
-app.post('/add',function(req,res){
-    // console.log(req.params.length);
-    // deleteData(req.params.key)
-    insertData();
-    res.setHeader('Content-Type', 'application/json');
+app.post('/delete/:key',function(req,res){
+    console.log(req.params.key);
+    deleteData(req.params.key)
     selectAll();
+    res.end(json);
+});
+
+app.post('/query?',function(req,res){
+    var myObj = JSON.parse(req.query.table);
+    selectAll2(myObj);
     res.end(json);
 });
 
@@ -82,12 +72,12 @@ connection.query('SELECT '+obj[0]["table"]+'.ID,'+obj[1]["table"]+'.Name FROM '+
 //         console.log('success');
 //         });
 // }
-// function deleteData(data){
-//   connection.query('delete from teacher where teacherID='+data+';', function(err,result, fields) {
-//     if (err) throw err;
-//         console.log('success');
-//         });
-// }
+function deleteData(data){
+  connection.query('delete from city where ID='+data+';', function(err,result, fields) {
+    if (err) throw err;
+        console.log('success');
+      });
+}
 connection.connect();
 // selectAll()
 // insertData();
