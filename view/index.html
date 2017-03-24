@@ -38,15 +38,19 @@
 		         }
 		   	xmlhttp.open("POST","http://localhost:3000"+path,true);
 		   	xmlhttp.setRequestHeader("Content-type","appication/json");
+		   	
 		   	xmlhttp.send(); //request from client to server for get data
 	   	}
+	   	var myObj = [{ "table":"city" },{ "table":"country" }];
+			var myJSON = JSON.stringify(myObj);
 	   	function deleteR(path){
-	 		ajaxPost("/delete/"+path)
+	 		ajaxPost("/delete/"+path+"?table="+myJSON)
 	   	}
 	   	function addValues(){
 	   		document.getElementById("add").innerHTML ="<td style='width: 100px; color: red;'>mks</td><td style='width: 100px; color: red;'>mks</td><td style='width: 100px; color: red;'>mks</td></tr>"
 	   		ajaxPost("/add")	
 	   	}
+
 	   	//var myVar = setInterval(, 1000);
 	   	// window.onload = function(){ ajaxGet("/data") };
   	</script>
@@ -62,8 +66,17 @@
 <body>
 
 <h1>A Heading</h1>
+<form >
+  First name:<br>
+  <input type="text" name="firstname" value="Mickey">
+  <br>
+  Last name:<br>
+  <input type="text" name="lastname" value="Mouse">
+  <br><br>
+  <input type="submit" value="Submit" >
+</form> 
 <div><div id="buildTable"></div></div>
-<button onclick="ajaxGet('/data')">show</button>
+<button onclick="ajaxPost('/data/school')">show</button>
 <button onclick="addValues()">add</button> <!--param id=8 table=1  -->
 </body>
 </html>
