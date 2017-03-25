@@ -21,7 +21,14 @@ app.post('/query?',function(req,res){
    console.log(req.query );
    res.setHeader('Content-Type', 'application/json');
    connectdatabase(req.query.database);
-   selectAll(req.query.table);
+   console.log(typeof req.query.table);
+   if(typeof req.query.table == Array){
+      selectJoin(req.query.table);
+   }
+   else{
+      selectAll(req.query.table);
+   }
+   
    // var myObj = JSON.stringify(req.query);
    // console.log(myobj);
    res.send();
@@ -43,14 +50,14 @@ function connectdatabase(name){
 }
 var json='';
 function selectAll(key){
-connection.query('SELECT * from '+key, function(err, rows, fields) {
+connection.query('SELECT * from '+key+" limit 100;", function(err, rows, fields) {
   if (err) throw err;
   json=JSON.stringify(rows);
 });
 }
-function selectAll2(obj){
+function selectJoin(obj){
 // connection.query('SELECT * from '+obj[1]["table"], function(err, rows, fields) {
-connection.query('SELECT '+obj[0]["table"]+'.ID,'+obj[1]["table"]+'.Name FROM '+obj[0]["table"]+' INNER JOIN '+obj[1]["table"]+' ON '+obj[0]["table"]+'.CountryCode='+obj[1]["table"]+'.Code; ', function(err, rows, fields) {
+connection.query('SELECT * FROM '+obj[0]+' INNER JOIN '+obj[1]+' limit 100;', function(err, rows, fields) {
   if (err) throw err;
   json=JSON.stringify(rows);
 });
@@ -68,8 +75,4 @@ function deleteData(data){
         console.log('success');
       });
 }
-// connection.connect();
-// selectAll()
-// insertData();
-//connection.end();
 app.listen(3000);

@@ -49,13 +49,14 @@
 	   		var temp='';
 	   		console.log(ele.length);
 	   		for(var i=0;i<ele.length;i++){
-	   			if(i!=(ele.length-1)){
-	   				temp +=ele[i].name+"="+ele[i].value+"&"
+	   			if(ele[i].checked==true){
+		   			if(i!=(ele.length-1)){
+		   				temp +=ele[i].name+"="+ele[i].value+"&"
+		   			}
+		   			else{
+		   				temp +=ele[i].name+"="+ele[i].value	
+		   			}
 	   			}
-	   			else{
-	   				temp +=ele[i].name+"="+ele[i].value	
-	   			}
-	   			
 	   		}
 	   		console.log(temp);
 	   		ajaxPost("/query?"+temp);
@@ -74,13 +75,14 @@
 </head>
 <body>
 
-<h1>A Heading</h1>
-<form id="formA" action="/as">
+<h1>Database</h1>
+<form>
   database :<br>
-  <input type="text" class="query" name="database" value="world">
+  <input type="checkbox" class="query" name="database" value="world">world
   <br>
   table :<br>
-  <input type="text" class="query"  name="table" value="city">
+  <input type="checkbox" class="query"  name="table" value="city">city
+  <input type="checkbox" class="query"  name="table" value="country">country
   <br><br>
 </form>
 <input type="submit" value="Submit" onclick="submit()">
