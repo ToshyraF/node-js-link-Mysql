@@ -1,12 +1,11 @@
 var express    = require('express');
 var app        = express();
 var mysql      = require('mysql');
-// var connection = mysql.createConnection({
-//       host     : '127.0.0.1',
-//       user     : 'root',
-//       password : '1234',
-//       database : 'world'   
-//     });
+ var connection = mysql.createConnection({
+       host     : '127.0.0.1',
+       user     : 'root',
+       password : '1234', 
+     });
 app.use(express.static(__dirname+"/view" ));
 // app.use(express.bodyParser());
 app.get('/',function(req,res){
@@ -62,6 +61,15 @@ connection.query('SELECT * FROM '+obj[0]+' INNER JOIN '+obj[1]+' limit 100;', fu
   json=JSON.stringify(rows);
 });
 }
+function showdata(){
+// connection.query('SELECT * from '+obj[1]["table"], function(err, rows, fields) {
+connection.query('show databases;', function(err, rows, fields) {
+  if (err) throw err;
+  json=JSON.stringify(rows);
+  console.log(json);
+});
+}
+
 // function insertData(){
 //     connection.query('INSERT teacher values ("0987654321","book","gok@gmail.com");', function(err,result, fields) {
 //     if (err) throw err;
@@ -75,4 +83,6 @@ function deleteData(data){
         console.log('success');
       });
 }
+connection.connect();
+showdata();
 app.listen(3000);
