@@ -10,7 +10,6 @@ app.use(express.static(__dirname+"/view" ));
 // app.use(express.bodyParser());
 app.get('/',function(req,res){
     res.render('index');
-
 }); 
 app.get('/data',function(req,res){
     res.setHeader('Content-Type', 'application/json');

@@ -8,20 +8,25 @@
 		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		         	var myObj = JSON.parse(this.responseText);
 		         	console.log(myObj);
-		         	var temp  = "<tr>";
-		         	for(var i=0;i<Object.keys(myObj[0]).length;i++){
-		         		temp+="<td style='width: 100px; color: red;'>"+Object.keys(myObj[0])[i]+"</td>"
-		         	}
-		         	temp+="</tr>"
-		         	for(var i=0;i<myObj.length;i++){
-		         	 	temp+="<tr>"
-		         	 	for (var key in myObj[i]){
-		         	 		temp+="<td style='width: 100px; color: red;'>"+myObj[i][key]+"</td>"
-		         			//console.log(key)
-		         		}	         	
-		         		temp+='<td><button onclick="deleteR('+myObj[i][Object.keys(myObj[0])[0]]+')">Delete</button></td></tr>'
-		         	}
-		            document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
+		         	// var temp  = "<tr>";
+		         	// for(var i=0;i<Object.keys(myObj[0]).length;i++){
+		         	// 	temp+="<td style='width: 100px; color: red;'>"+Object.keys(myObj[0])[i]+"</td>"
+		         	// }
+		         	// temp+="</tr>"
+		         	// for(var i=0;i<myObj.length;i++){
+		         	//  	temp+="<tr>"
+		         	//  	for (var key in myObj[i]){
+		         	//  		temp+="<td style='width: 100px; color: red;'>"+myObj[i][key]+"</td>"
+		         	// 		//console.log(key)
+		         	// 	}	         	
+		         	// 	temp+='<td><button onclick="deleteR('+myObj[i][Object.keys(myObj[0])[0]]+')">Delete</button></td></tr>'
+		         	// }
+		          //   document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
+		          	var temp=''
+		          	for (var i=0;i<myObj.length;i++){
+		          		temp +='<input type="checkbox" class="query" name="database" value="'+myObj[i]["Database"]+'">'+myObj[i]["Database"]
+		          	}
+		          	document.getElementById("buildcheckbox").innerHTML =temp;
 		         	// console.log(myObj[0]["email"]);//get attribute of database
 
 		         }
@@ -62,7 +67,7 @@
 	   		ajaxPost("/query?"+temp);
 	   	}
 	   	//var myVar = setInterval(, 1000);
-	   	// window.onload = function(){ ajaxGet("/data") };
+	   	window.onload = function(){ ajaxGet("/data") };
   	</script>
   <style>
   myHero {
@@ -78,7 +83,7 @@
 <h1>Database</h1>
 <form>
   database :<br>
-  <input type="checkbox" class="query" name="database" value="world">world
+  <div id="buildcheckbox"></div>>
   <br>
   table :<br>
   <input type="checkbox" class="query"  name="table" value="city">city
