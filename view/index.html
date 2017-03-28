@@ -2,43 +2,23 @@
 <html>
 <head>
   	<script>
-  		function ajaxGet(path){
+  		function ajaxGet(path,makeFunction){
 		  	xmlhttp = new XMLHttpRequest();
 		   	xmlhttp.onreadystatechange=function(){
 		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
-		         	var myObj = JSON.parse(this.responseText);
-		         	console.log(myObj);
-		         	// var temp  = "<tr>";
-		         	// for(var i=0;i<Object.keys(myObj[0]).length;i++){
-		         	// 	temp+="<td style='width: 100px; color: red;'>"+Object.keys(myObj[0])[i]+"</td>"
-		         	// }
-		         	// temp+="</tr>"
-		         	// for(var i=0;i<myObj.length;i++){
-		         	//  	temp+="<tr>"
-		         	//  	for (var key in myObj[i]){
-		         	//  		temp+="<td style='width: 100px; color: red;'>"+myObj[i][key]+"</td>"
-		         	// 		//console.log(key)
-		         	// 	}	         	
-		         	// 	temp+='<td><button onclick="deleteR('+myObj[i][Object.keys(myObj[0])[0]]+')">Delete</button></td></tr>'
-		         	// }
-		          //   document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
-		          	var temp=''
-		          	for (var i=0;i<myObj.length;i++){
-		          		temp +='<input type="checkbox" class="query" name="database" value="'+myObj[i]["Database"]+'">'+myObj[i]["Database"]
-		          	}
-		          	document.getElementById("buildcheckbox").innerHTML =temp;
-		         	// console.log(myObj[0]["email"]);//get attribute of database
-
+		         	var data = JSON.parse(this.responseText);
+		         	console.log(data);
+		         	makeFunction(data);
 		         }
 		   	}
 		   	xmlhttp.open("GET","http://localhost:3000"+path, true);
 		   	xmlhttp.send(); //request from client to server for get data
 	   	}
-	   	function ajaxPost(path){
+	   	function ajaxPost(path,makeFunction){
 		  	xmlhttp = new XMLHttpRequest();
 		  	xmlhttp.onreadystatechange=function(){
 		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
-		         		setTimeout("ajaxGet('/data')",100);
+		         		setTimeout("ajaxGet('/data',"+makeFunction+")",100);
 		         	}
 		         }
 		   	xmlhttp.open("POST","http://localhost:3000"+path,true);
@@ -64,10 +44,59 @@
 	   			}
 	   		}
 	   		console.log(temp);
-	   		ajaxPost("/query?"+temp);
+	   		ajaxPost("/query?"+temp,build_table);
 	   	}
 	   	//var myVar = setInterval(, 1000);
-	   	window.onload = function(){ ajaxGet("/data") };
+	   	 window.onload = function(){ ajaxGet("/data",buildbox) };
+	   	function buildbox(myObj){
+	   		var box=''
+		          	for (var i=0;i<myObj.length;i++){
+		          		box +='<input type="radio" class="query" name="database" value="'+myObj[i]["Database"]+'" onchange="selectDB()" >'+myObj[i]["Database"]
+		          	}
+		          	document.getElementById("buildcheckbox").innerHTML = box;
+	   	}
+	   	function selectDB(){
+	   		var ele = document.getElementsByName("database");
+	   		var temp='';
+	   		console.log(ele.length);
+		   	for (var i=0;i<ele.length;i++){
+			   	if(ele[i].checked==true){
+			   		temp +=ele[i].name+"="+ele[i].value
+			   	}	
+			}
+	   		console.log(temp);
+	   		ajaxPost("/selectDB?"+temp,build_choice);
+
+	   	}
+	   	function build_choice(myObj){
+	   		var checkbox_form = "table: <br>";	
+		         		for(var i=0;i<myObj.length;i++){
+		         			for (var key in myObj[i]){
+			         	 		checkbox_form+="<input type='checkbox' class='query'  name='table' value="+myObj[i][key]+">"+myObj[i][key]+"";
+			         			//console.log(key)
+			         		}	   
+		         		}			            
+		         		document.getElementById("buildchoice").innerHTML ="<form>"+checkbox_form+"</form>"; //callback
+
+	   	}
+	   	function build_table(myObj){
+	   		var temp  = "<tr>";
+			         	for(var i=0;i<Object.keys(myObj[0]).length;i++){
+			         		temp+="<td style='width: 100px; color: red;'>"+Object.keys(myObj[0])[i]+"</td>"
+			         	}
+			         	temp+="</tr>"
+			         	for(var i=0;i<myObj.length;i++){
+			         	 	temp+="<tr>"
+			         	 	for (var key in myObj[i]){
+			         	 		temp+="<td style='width: 100px; color: red;'>"+myObj[i][key]+"</td>"
+			         			//console.log(key)
+			         		}	         	
+			         		temp+='<td><button onclick="deleteR('+myObj[i][Object.keys(myObj[0])[0]]+')">Delete</button></td></tr>'
+			         	}
+			            document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
+			         	// console.log(myObj[0]["email"]);//get attribute of database
+
+	   	}
   	</script>
   <style>
   myHero {
@@ -81,15 +110,11 @@
 <body>
 
 <h1>Database</h1>
-<form>
   database :<br>
-  <div id="buildcheckbox"></div>>
+  <!-- <input type="radio" class="query" name="database" value="world" onchange="selectDB()">world -->
+  <div id="buildcheckbox"></div>
   <br>
-  table :<br>
-  <input type="checkbox" class="query"  name="table" value="city">city
-  <input type="checkbox" class="query"  name="table" value="country">country
-  <br><br>
-</form>
+  <div id = "buildchoice" ></div>
 <input type="submit" value="Submit" onclick="submit()">
 <div><div id="buildTable"></div></div>
 <button onclick="query()">Query</button> <!--param id=8 table=1  -->

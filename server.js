@@ -38,6 +38,7 @@ app.post('/delete/:key',function(req,res){
     res.end(json);
 });
 function connectdatabase(name){
+  connection.end();
   connection = mysql.createConnection({
       host     : '127.0.0.1',
       user     : 'root',
@@ -47,6 +48,15 @@ function connectdatabase(name){
     connection.connect();
 }
 var json='';
+app.post('/selectDB?',function(req,res){
+  console.log(req.query );
+   res.setHeader('Content-Type', 'application/json');
+   console.log(req.query.database);
+   tablename(req.query.database);
+   // var myObj = JSON.stringify(req.query);
+   // console.log(myobj);
+   res.send();
+});
 function selectAll(key){
 connection.query('SELECT * from '+key+" limit 100;", function(err, rows, fields) {
   if (err) throw err;
@@ -68,7 +78,14 @@ connection.query('show databases;', function(err, rows, fields) {
   console.log(json);
 });
 }
-
+function tablename(key){
+  connectdatabase(key);
+  connection.query('show tables;',function(err,rows,fields){
+   if (err) throw err;
+   json=JSON.stringify(rows);
+   console.log(rows);
+});
+} 
 // function insertData(){
 //     connection.query('INSERT teacher values ("0987654321","book","gok@gmail.com");', function(err,result, fields) {
 //     if (err) throw err;

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<script>
+  		function ajaxGet(path,makeFunction){
+		  	xmlhttp = new XMLHttpRequest();
+		   	xmlhttp.onreadystatechange=function(){
+		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		         	var myObj = JSON.parse(this.responseText);
+		         	console.log(myObj);
+		         	// var temp  = "<tr>";
+		         	//  for(var i=0;i<Object.keys(myObj[0]).length;i++){
+		         	//  	temp+="<td style='width: 100px; color: red;'>"+Object.keys(myObj[0])[i]+"</td>"
+		         	//  }
+		         	//  temp+="</tr>"
+		         	//  for(var i=0;i<myObj.length;i++){
+		         	//   	temp+="<tr>"
+		         	//   	for (var key in myObj[i]){
+		         	//   		temp+="<td style='width: 100px; color: red;'>"+myObj[i][key]+"</td>"
+		         	//  		//console.log(key)
+		         	//  	}	         	
+		         	//  	temp+='<td><button onclick="deleteR('+myObj[i][Object.keys(myObj[0])[0]]+')">Delete</button></td></tr>'
+		         	//  }
+		          //    document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
+		          	makeFunction(myObj);
+		         	// console.log(myObj[0]["email"]);//get attribute of database
+
+		         }
+		   	}
+		   	xmlhttp.open("GET","http://localhost:3000"+path, true);
+		   	xmlhttp.send(); //request from client to server for get data
+	   	}
+	   	function buildbox(myObj){
+	   		var box=''
+		          	for (var i=0;i<myObj.length;i++){
+		          		box +='<input type="checkbox" class="query" name="database" value="'+myObj[i]["Database"]+'">'+myObj[i]["Database"]
+		          	}
+		          	document.getElementById("buildcheckbox").innerHTML = box;
+	   	}
+	   	function buildTable(table){
+	   		 var temp  = "<tr>";
+		         	 for(var i=0;i<Object.keys(table[0]).length;i++){
+		         	 	temp+="<td style='width: 100px; color: red;'>"+Object.keys(table[0])[i]+"</td>"
+		         	 }
+		         	 temp+="</tr>"
+		         	 for(var i=0;i<table.length;i++){
+		         	  	temp+="<tr>"
+		         	  	for (var key in table[i]){
+		         	  		temp+="<td style='width: 100px; color: red;'>"+table[i][key]+"</td>"
+		         	 		//console.log(key)
+		         	 	}	         	
+		         	 	temp+='<td><button onclick="deleteR('+table[i][Object.keys(table[0])[0]]+')">Delete</button></td></tr>'
+		         	 }
+		             document.getElementById("buildTabled").innerHTML ="<table>"+temp+"</table>"; //callback
+	   	}
+	   	function ajaxPost(path){
+		  	xmlhttp = new XMLHttpRequest();
+		  	xmlhttp.onreadystatechange=function(){
+		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		         		setTimeout("ajaxGet('/data',buildTable)",100);
+		         	}
+		         }
+		   	xmlhttp.open("POST","http://localhost:3000"+path,true);
+		   	xmlhttp.setRequestHeader("Content-type","appication/json");
+		   	
+		   	xmlhttp.send(); //request from client to server for get data
+	   	}			
+	   	function deleteR(path){
+	 		ajaxPost("/delete/"+path)
+	   	}
+	   	function submit(){
+	   		var ele = document.getElementsByClassName("query");
+	   		var temp='';
+	   		console.log(ele.length);
+	   		for(var i=0;i<ele.length;i++){
+	   			if(ele[i].checked==true){
+		   			if(i!=(ele.length-1)){
+		   				temp +=ele[i].name+"="+ele[i].value+"&"
+		   			}
+		   			else{
+		   				temp +=ele[i].name+"="+ele[i].value	
+		   			}
+	   			}
+	   		}
+	   		console.log(temp);
+	   		ajaxPost("/query?"+temp); 
+	   	}
+	   	//var myVar = setInterval(, 1000);
+	   	window.onload = function(){ ajaxGet("/data",buildbox) };
+  	</script>
+  <style>
+  myHero {
+      display: block;
+      background-color: #dddddd;
+      padding: 50px;
+      font-size: 30px;
+  } 
+  </style> 
+</head>
+<body>
+
+<h1>Database</h1>
+<form>
+  database :<br>
+  <div id="buildcheckbox"></div>
+  <!-- <input type="checkbox" class="query"  name="database" value="world">world -->
+  <br>
+  table :<br>
+  <input type="checkbox" class="query"  name="table" value="city">city
+  <input type="checkbox" class="query"  name="table" value="country">country
+  <br><br>
+</form>
+<input type="submit" value="Submit" onclick="submit()">
+<div><div id="buildTabled"></div></div>
+<button onclick="query()">Query</button> <!--param id=8 table=1  -->
+</body>
+</html>
