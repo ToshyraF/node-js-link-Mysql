@@ -18,7 +18,7 @@ app.get('/data',function(req,res){
 app.post('/query?',function(req,res){
    console.log(req.query );
    res.setHeader('Content-Type', 'application/json');
-   connectdatabase(req.query.database);
+   //connectdatabase(req.query.database);
    console.log(typeof req.query.table);
    if(typeof req.query.table == Array){
       selectJoin(req.query.table);
