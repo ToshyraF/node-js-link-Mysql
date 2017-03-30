@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
 <head>
   	<script>
@@ -36,11 +36,9 @@
 	   		console.log(ele.length);
 	   		for(var i=0;i<ele.length;i++){
 	   			if(ele[i].checked==true){
-
 		   			count = count + 1 ;
 		   			if(i!=(ele.length-1)){
 		   				temp +=ele[i].name+"="+ele[i].value+"&"
-		   			
 		   			}
 		   			else{
 		   				temp +=ele[i].name+"="+ele[i].value	
@@ -49,21 +47,21 @@
 	   		}
 	   		 if(count != 0 ){
 	   		 	console.log(count);
-	   		console.log(temp);
-	   		ajaxPost("/query?"+temp,build_table);
+		   		console.log(temp);
+		   		ajaxPost("/query?"+temp,build_table);
 	   		 }else{
 	   		 	alert('please select table');
 	   		 }
 	   	}
 	   	//var myVar = setInterval(, 1000);
-	   	//  window.onload = function(){ ajaxGet("/data",buildbox) };
-	   	// function buildbox(myObj){
-	   	// 	var box=''
-		   //        	for (var i=0;i<myObj.length;i++){
-		   //        		box +='<input type="radio" class="database" name="database" value="'+myObj[i]["Database"]+'" onchange="selectDB()" >'+myObj[i]["Database"]
-		   //        	}
-		   //        	document.getElementById("buildcheckbox").innerHTML = box;
-	   	// }
+	   	window.onload = function(){ ajaxPost("/database",buildbox) };
+	   	function buildbox(myObj){
+	   	 	var box=''
+		           	for (var i=0;i<myObj.length;i++){
+		           		box +='<a><input type="radio" class="query" name="database" value="'+myObj[i]["Database"]+'" onchange="selectDB()" >'+myObj[i]["Database"]+'</a>'
+		           	}
+		           	document.getElementById("buildcheckbox").innerHTML = box;
+	   	}
 	   	function selectDB(){
 	   		var ele = document.getElementsByName("database");
 	   		var temp='';
@@ -74,18 +72,40 @@
 			   	}	
 			}
 	   		console.log(temp);
-	   		ajaxPost("/selectDB?"+temp,build_choice);
+	   		ajaxPost("/selectDB?"+temp,build_choiceTable);
 
 	   	}
-	   	function build_choice(myObj){
+	   	function selectTB(){
+	   		var ele = document.getElementsByName("table");
+	   		var temp='';
+	   		console.log(ele.length);
+		   	for (var i=0;i<ele.length;i++){
+			   	if(ele[i].checked==true){
+			   		temp +=ele[i].name+"="+ele[i].value
+			   	}	
+			}
+			console.log(temp);
+			ajaxPost("/selectTB?"+temp,build_choiceColumn);
+	   	}
+	   	function build_choiceTable(myObj){
 	   		var checkbox_form = "<a>table: </a>";	
 		         		for(var i=0;i<myObj.length;i++){
 		         			for (var key in myObj[i]){
-			         	 		checkbox_form+="<a><input type='checkbox' class='query'  name='table' value="+myObj[i][key]+">"+myObj[i][key]+"</a>";
+			         	 		checkbox_form+="<a><input type='checkbox' class='query'  onchange='selectTB()' name='table' value="+myObj[i][key]+">"+myObj[i][key]+"</a>";
 			         			//console.log(key)
 			         		}	   
 		         		}			            
-		         		document.getElementById("buildchoice").innerHTML ="<form>"+checkbox_form+"</form>"; //callback
+		         		document.getElementById("buildchoiceTable").innerHTML ="<form>"+checkbox_form+"</form>	<div id = 'buildChoiceColumn'></div>"; //callback
+
+	   	}
+	   	function build_choiceColumn(myObj){
+	   		var checkbox_form = "<a>Columns: </a>";	
+		         		for(var i=0;i<myObj.length;i++){
+		         			for (var key in myObj[i]){
+			         	 		checkbox_form+="<a><input type='checkbox' class='query'  name='column' value="+myObj[i][key]+">"+myObj[i][key]+"</a>";
+			         		}	   
+		         		}			            
+		         		document.getElementById("buildChoiceColumn").innerHTML ="<form>"+checkbox_form+"</form>"; //callback
 
 	   	}
 	   	function build_table(myObj){
@@ -168,19 +188,22 @@
 .button2 {background-color: #008CBA;} /* Blue */
   </style> 
 </head>
+<!-- <body> -->
 <body onload="selectDB()">
 <div id="mySidenav" class="sidenav">
  <a>Database</a>
   <a>database :</a>
   <!-- <input type="radio" class="query" name="database" value="world" onchange="selectDB()">world -->
-  <div id="buildcheckbox"></div>
+  <!-- <div id="buildcheckbox"></div> -->
 <form >
  <a> <input type="radio" class="databaseName" name="database" value="world" onchange="selectDB()" checked="checked">world</a>
 
  <a> <input type="radio" class="databaseName" name="database" value="school" onchange="selectDB()">school</a>
-  </form>
+</form> 
  
-  <div id = "buildchoice" ></div>
+  <div id = "buildchoiceTable" >
+  
+  </div>
   <input class="button button2" type="submit" value="Submit" onclick="submit()">
 
 </div>
