@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  	<script>
+  		function ajaxGet(path,makeFunction){
+		  	xmlhttp = new XMLHttpRequest();
+		   	xmlhttp.onreadystatechange=function(){
+		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		         	var data = JSON.parse(this.responseText);
+		         	console.log(data);
+		         	makeFunction(data);
+		         }
+		   	}
+		   	xmlhttp.open("GET","http://localhost:3000"+path, true);
+		   	xmlhttp.send(); //request from client to server for get data
+	   	}
+	   	function ajaxPost(path,makeFunction){
+		  	xmlhttp = new XMLHttpRequest();
+		  	xmlhttp.onreadystatechange=function(){
+		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		         		setTimeout("ajaxGet('/data',"+makeFunction+")",100);
+		         	}
+		         }
+		   	xmlhttp.open("POST","http://localhost:3000"+path,true);
+		   	xmlhttp.setRequestHeader("Content-type","appication/json");
+
+		   	xmlhttp.send(); //request from client to server for get data
+	   	}
+
+	   	function submit(){
+	   		var ele = document.getElementsByClassName("query");
+	   		var temp='';
+	   		var count = 0;
+	   		console.log(ele.length);
+	   		for(var i=0;i<ele.length;i++){
+	   			if(ele[i].checked==true){
+		   			count = count + 1 ;
+		   			if(i!=(ele.length-1)){
+		   				temp +=ele[i].name+"="+ele[i].value+"&"
+		   			}
+		   			else{
+		   				temp +=ele[i].name+"="+ele[i].value
+		   			}
+	   			}
+	   		}
+	   		 if(count != 0 ){
+	   		 	console.log(count);
+		   		console.log(temp);
+		   		ajaxPost("/query?"+temp,build_table);
+	   		 }else{
+	   		 	alert('please select table');
+	   		 }
+	   	}
+	   	//var myVar = setInterval(, 1000);
+	   	window.onload = function(){ ajaxPost("/database",buildbox) };
+	   	function buildbox(myObj){
+	   	 	var box=''
+		           	for (var i=0;i<myObj.length;i++){
+		           		box +='<a><input type="radio" class="query" name="database" value="'+myObj[i]["Database"]+'" onchange="selectDB()" >'+myObj[i]["Database"]+'</a>'
+		           	}
+		           	document.getElementById("buildcheckbox").innerHTML = box;
+	   	}
+	   	function selectDB(){
+	   		var ele = document.getElementsByName("database");
+	   		var temp='';
+	   		console.log(ele.length);
+		   	for (var i=0;i<ele.length;i++){
+			   	if(ele[i].checked==true){
+			   		temp +=ele[i].name+"="+ele[i].value
+			   	}
+			}
+	   		console.log(temp);
+	   		ajaxPost("/selectDB?"+temp,build_choiceTable);
+
+	   	}
+	   	function selectTB(){
+	   		var ele = document.getElementsByName("table");
+	   		var temp='';
+	   		console.log(ele.length);
+		   	for (var i=0;i<ele.length;i++){
+			   	if(ele[i].checked==true){
+			   		temp +=ele[i].name+"="+ele[i].value
+			   	}
+			}
+			console.log(temp);
+			ajaxPost("/selectTB?"+temp,build_choiceColumn);
+	   	}
+	   	function build_choiceTable(myObj){
+	   		var checkbox_form = "<a>table: </a>";
+		         		for(var i=0;i<myObj.length;i++){
+		         			for (var key in myObj[i]){
+			         	 		checkbox_form+="<a><input type='radio' class='query'  onchange='selectTB()' name='table' value="+myObj[i][key]+">"+myObj[i][key]+"</a>";
+			         			//console.log(key)
+			         		}
+		         		}
+		         		document.getElementById("buildchoiceTable").innerHTML ="<form>"+checkbox_form+"</form>	<div id = 'buildChoiceColumn'></div>"; //callback
+
+	   	}
+	   	function build_choiceColumn(myObj){
+	   		var checkbox_form = "<a>Columns: </a>";
+		         		for(var i=0;i<myObj.length;i++){
+		         			for (var key in myObj[i]){
+                    if(key == "Field"){
+			         	 		      checkbox_form+="<a><input type='checkbox' class='query'  name='column' value="+myObj[i][key]+">"+myObj[i][key]+"</a>";
+                    }
+                  }
+		         		}
+		         		document.getElementById("buildChoiceColumn").innerHTML ="<form>"+checkbox_form+"</form>"; //callbac
+	   	}
+
+
+      function afterSearch(myObj){
+  			var x =  myObj;
+  			console.log("Test complete ="+x);
+  			build_table(myObj);
+			}
+      function search(){
+    			var s = document.getElementById("searchBox");
+    			var table = document.getElementsByName("table");
+    			var columns = document.getElementsByName("column");
+    			var tempTable = '';
+    			var tempColumns = '';
+    			for(i = 0; i < table.length; i++){
+    				if(table[i].checked === true){
+    					tempTable += table[i].name+'='+table[i].value+'&';
+    				}
+    			}
+    			for(i = 0; i < columns.length; i++){
+    				tempColumns += columns[i].name+'='+columns[i].value;
+    				tempColumns += '&';
+    			}
+    			keyword = s.name+'='+s.value;
+    			var  keep = tempTable+tempColumns+keyword;
+    			console.log('keep = '+keep);
+    			ajaxPost("/search?"+keep,afterSearch);
+  		}
+
+
+	   	function build_table(myObj){
+	   		btn.style.display = "block";
+	   		create_Addform(myObj);
+	   		var temp  = "<tr id='head'>";
+			         	for(var i=0;i<Object.keys(myObj[0]).length;i++){
+			         		temp+="<td style='width: 100px; color: red;'>"+Object.keys(myObj[0])[i]+"</td>"
+			         	}
+			         	temp+="</tr>"
+			         	for(var i=0;i<myObj.length;i++){
+			         	 	temp+="<tr id='row"+i+"' contentEditable = 'false' >"
+			         	 	for (var key in myObj[i]){
+			         	 		temp+="<td style='width: 100px; color: red;'>"+myObj[i][key]+"</td>"
+			         			//console.log(key)
+			         		}
+			         		//temp+='<td><button onclick="deleteR('+myObj[i][Object.keys(myObj[0])[0]]+')">Delete</button>'
+			         		temp+='<td><input type="button" id="delete_button'+i+'" value="delete" class="delete" onclick="deleteR('+i+')">'
+			         		temp+='<input type="button" id="edit_button'+i+'" value="Edit" class="edit" onclick="edit_row('+i+')">'
+    						temp+='<input type="button" id="save_button'+i+'" value="Save" class="save" onclick="save_row('+i+')"></td></tr>'
+			         	}
+			            document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
+			         	// console.log(myObj[0]["email"]);//get attribute of database
+
+	   	}
+
+
+	   	function create_Addform(myObj){
+
+
+			var	 add_form = "<table><tr>"
+
+			for(var i=0;i<Object.keys(myObj[0]).length;i++){
+
+				add_form += "<td style='width: 100px;'>"+Object.keys(myObj[0])[i]+"</td>"
+
+			}
+				add_form += "</tr><tr>"
+			for(var i=0;i<Object.keys(myObj[0]).length;i++){
+				add_form +="  <td>  <input type='text' class='insert' value='' name="+Object.keys(myObj[0])[i]+" ></td>"
+			}
+				add_form += "</tr></table>"
+				add_form +="    <input type='button' id='add_button' value='Add' class='add' onclick='Add()'>"
+
+
+				 console.log(add_form);
+				 document.getElementById("mycontent").innerHTML =add_form; //callback
+	   	}
+	   	function databasefirsttime() {
+    alert("Page is loaded");
+}
+		function deleteR(no){
+			 var tbl = document.getElementById('row'+no);
+			 var tbl_head = document.getElementById('head');
+		 var temp='';
+		 var ele = document.getElementsByName("table");
+
+	   		console.log(ele.length);
+		   	for (var i=0;i<ele.length;i++){
+			   	if(ele[i].checked==true){
+			   		temp +=ele[i].name+"="+ele[i].value+"&"
+			   	}
+			}
+
+	        if (tbl != null) {
+
+
+	                 temp +=tbl_head.cells[0].innerHTML+"="+tbl.cells[0].innerHTML+"&"
+	             console.log(temp);
+	 		ajaxPost("/delete?"+temp,build_table)
+	 		submit();
+	   	}
+	   }
+		function save_row(no)
+		{
+
+		 document.getElementById("edit_button"+no).style.display="block";
+		 document.getElementById("save_button"+no).style.display="none";
+
+			 var tbl = document.getElementById('row'+no);
+			 var tbl_head = document.getElementById('head');
+		 var temp='';
+		 var ele = document.getElementsByName("table");
+
+	   		console.log(ele.length);
+		   	for (var i=0;i<ele.length;i++){
+			   	if(ele[i].checked==true){
+			   		temp +=ele[i].name+"="+ele[i].value+"&"
+			   	}
+			}
+		        tbl.contentEditable = "false";
+
+	        if (tbl != null) {
+
+	                for (var j = 0; j < tbl.cells.length-1; j++)
+	                 temp +=tbl_head.cells[j].innerHTML+"="+tbl.cells[j].innerHTML+"&"
+	             console.log(temp);
+	             ajaxPost("/update?"+temp);
+	             submit();
+	        }
+
+		}
+
+		function edit_row(no)
+		{
+		console.log("test edit");
+		 document.getElementById("edit_button"+no).style.display="none";
+		 document.getElementById("save_button"+no).style.display="block";
+
+			 var x = document.getElementById('row'+no);
+
+		        x.contentEditable = "true";
+
+}
+		function Add(){
+			console.log("Add");
+			var ele = document.getElementsByClassName("insert");
+	   		var temp='';
+	   		var count = 0;
+	   		console.log(ele.length);
+	   		 var ele2 = document.getElementsByName("table");
+
+	   		console.log(ele2.length);
+		   	for (var i=0;i<ele2.length;i++){
+			   	if(ele2[i].checked==true){
+			   		temp +=ele2[i].name+"="+ele2[i].value+"&"
+			   	}
+			}
+	   		for(var i=0;i<ele.length;i++){
+
+	   			if(ele[i].value != ''){
+		   				temp +=ele[i].name+"="+ele[i].value+"&"
+		   				ele[i].value ='';
+		   			}
+		   			else{
+		   				count ++;
+		   			}
+
+	   		}
+	   		 if(count == 0 ){
+	   		 	console.log(count);
+		   		console.log(temp);
+		   		ajaxPost("/insert?"+temp);
+		   		submit();
+
+	   		 }else{
+	   		 	alert('please inset all data');
+	   		 }
+
+		}
+  	</script>
+  <style>
+  myHero {
+      display: block;
+      background-color: #dddddd;
+      padding: 50px;
+      font-size: 30px;
+  }
+  body {
+    font-family: "Lato", sans-serif;
+}
+
+.sidenav {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    z-index: 1;
+    top: 19.5%;
+    left: 0.5%;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+}
+
+.sidenav a:hover, .offcanvas a:focus{
+    color: #f1f1f1;
+}
+
+.main {
+    margin-left: 250px;
+}
+.button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+     position:relative;
+    top:0%;
+    left:25%;
+}
+.button2 {background-color: #008CBA;} /* Blue */
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.btn{
+	display: none;
+}
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+  </style>
+</head>
+<!-- <body> -->
+<body onload="selectDB()">
+  <div class="wrapper row1">
+    <header id="header" class="clear">
+      <div id="hgroup">
+        <h1><a href="#">Web Database System</a></h1>
+        <h2>Demo version</h2>
+      </div>
+    </header>
+  </div>
+
+<div id="mySidenav" class="sidenav" >
+  <input class="button button2" type="submit" value="Submit" onclick="submit()">
+  <a>database :</a>
+  <a><input type="radio" class="databaseName" name="database" value="world" onchange="selectDB()" checked="checked">world</a>
+  <div id = "buildchoiceTable" ></div>
+</div>
+
+<div  class="main" style="marginLeft:250px;">
+  <div class="bar" style="margin-left:0%;margin-top:0.2%;">
+        <p style="text-align:center;">Show Database</p>
+  </div>
+  <form >
+    Find: <input type="text" id="searchBox" name="searchBox" >
+    <button type="button" onclick="search();">Search</button>
+  </form>
+	<!-- Trigger/Open The Modal -->
+	<button id="myBtn" class="btn">Add</button>
+	<!-- The Modal -->
+		<div id='myModal' class='modal'>
+		<!-- Modal content -->
+				<div class='modal-content'>
+				<span class='close'>&times;</span>
+					<div id="mycontent">
+
+					</div>
+				</div>
+		</div>
+
+
+		<div>
+			<div id="buildTable">
+
+			</div>
+		</div>
+	<!-- <button class="button button2" onclick="query()">Query</button>--> <!--param id=8 table=1  -->
+</div>
+
+<script>
+// Get the modal
+var modal = document.getElementById('myModal');
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal
+btn.onclick = function() {
+    modal.style.display = "block";
+    console.log("passs");
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+    console.log("pass2");
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+        console.log("pass3");
+    }
+}
+</script>
+</body>
+</html>

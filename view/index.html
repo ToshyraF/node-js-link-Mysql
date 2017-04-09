@@ -1,219 +1,73 @@
-<!DOCTYPE html> 
-<html>
-<head>
-  	<script>
-  		function ajaxGet(path,makeFunction){
-		  	xmlhttp = new XMLHttpRequest();
-		   	xmlhttp.onreadystatechange=function(){
-		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
-		         	var data = JSON.parse(this.responseText);
-		         	console.log(data);
-		         	makeFunction(data);
-		         }
-		   	}
-		   	xmlhttp.open("GET","http://localhost:3000"+path, true);
-		   	xmlhttp.send(); //request from client to server for get data
-	   	}
-	   	function ajaxPost(path,makeFunction){
-		  	xmlhttp = new XMLHttpRequest();
-		  	xmlhttp.onreadystatechange=function(){
-		         if (xmlhttp.readyState==4 && xmlhttp.status==200){
-		         		setTimeout("ajaxGet('/data',"+makeFunction+")",100);
-		         	}
-		         }
-		   	xmlhttp.open("POST","http://localhost:3000"+path,true);
-		   	xmlhttp.setRequestHeader("Content-type","appication/json");
-		   	
-		   	xmlhttp.send(); //request from client to server for get data
-	   	}			
-	   	function deleteR(path){
-	 		ajaxPost("/delete/"+path)
-	   	}
-	   	function submit(){
-	   		var ele = document.getElementsByClassName("query");
-	   		var temp='';
-	   		var count = 0;
-	   		console.log(ele.length);
-	   		for(var i=0;i<ele.length;i++){
-	   			if(ele[i].checked==true){
-		   			count = count + 1 ;
-		   			if(i!=(ele.length-1)){
-		   				temp +=ele[i].name+"="+ele[i].value+"&"
-		   			}
-		   			else{
-		   				temp +=ele[i].name+"="+ele[i].value	
-		   			}
-	   			}
-	   		}
-	   		 if(count != 0 ){
-	   		 	console.log(count);
-		   		console.log(temp);
-		   		ajaxPost("/query?"+temp,build_table);
-	   		 }else{
-	   		 	alert('please select table');
-	   		 }
-	   	}
-	   	//var myVar = setInterval(, 1000);
-	   	window.onload = function(){ ajaxPost("/database",buildbox) };
-	   	function buildbox(myObj){
-	   	 	var box=''
-		           	for (var i=0;i<myObj.length;i++){
-		           		box +='<a><input type="radio" class="query" name="database" value="'+myObj[i]["Database"]+'" onchange="selectDB()" >'+myObj[i]["Database"]+'</a>'
-		           	}
-		           	document.getElementById("buildcheckbox").innerHTML = box;
-	   	}
-	   	function selectDB(){
-	   		var ele = document.getElementsByName("database");
-	   		var temp='';
-	   		console.log(ele.length);
-		   	for (var i=0;i<ele.length;i++){
-			   	if(ele[i].checked==true){
-			   		temp +=ele[i].name+"="+ele[i].value
-			   	}	
-			}
-	   		console.log(temp);
-	   		ajaxPost("/selectDB?"+temp,build_choiceTable);
+<!DOCTYPE html>
+	<html>
+		<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+			<title></title>
+		</head>
+		<body>
 
-	   	}
-	   	function selectTB(){
-	   		var ele = document.getElementsByName("table");
-	   		var temp='';
-	   		console.log(ele.length);
-		   	for (var i=0;i<ele.length;i++){
-			   	if(ele[i].checked==true){
-			   		temp +=ele[i].name+"="+ele[i].value
-			   	}	
-			}
-			console.log(temp);
-			ajaxPost("/selectTB?"+temp,build_choiceColumn);
-	   	}
-	   	function build_choiceTable(myObj){
-	   		var checkbox_form = "<a>table: </a>";	
-		         		for(var i=0;i<myObj.length;i++){
-		         			for (var key in myObj[i]){
-			         	 		checkbox_form+="<a><input type='checkbox' class='query'  onchange='selectTB()' name='table' value="+myObj[i][key]+">"+myObj[i][key]+"</a>";
-			         			//console.log(key)
-			         		}	   
-		         		}			            
-		         		document.getElementById("buildchoiceTable").innerHTML ="<form>"+checkbox_form+"</form>	<div id = 'buildChoiceColumn'></div>"; //callback
-
-	   	}
-	   	function build_choiceColumn(myObj){
-	   		var checkbox_form = "<a>Columns: </a>";	
-		         		for(var i=0;i<myObj.length;i++){
-		         			for (var key in myObj[i]){
-			         	 		checkbox_form+="<a><input type='checkbox' class='query'  name='column' value="+myObj[i][key]+">"+myObj[i][key]+"</a>";
-			         		}	   
-		         		}			            
-		         		document.getElementById("buildChoiceColumn").innerHTML ="<form>"+checkbox_form+"</form>"; //callback
-
-	   	}
-	   	function build_table(myObj){
-	   		var temp  = "<tr>";
-			         	for(var i=0;i<Object.keys(myObj[0]).length;i++){
-			         		temp+="<td style='width: 100px; color: red;'>"+Object.keys(myObj[0])[i]+"</td>"
-			         	}
-			         	temp+="</tr>"
-			         	for(var i=0;i<myObj.length;i++){
-			         	 	temp+="<tr>"
-			         	 	for (var key in myObj[i]){
-			         	 		temp+="<td style='width: 100px; color: red;'>"+myObj[i][key]+"</td>"
-			         			//console.log(key)
-			         		}	         	
-			         		temp+='<td><button onclick="deleteR('+myObj[i][Object.keys(myObj[0])[0]]+')">Delete</button></td></tr>'
-			         	}
-			            document.getElementById("buildTable").innerHTML ="<table>"+temp+"</table>"; //callback
-			         	// console.log(myObj[0]["email"]);//get attribute of database
-
-	   	}
-	   	function databasefirsttime() {
-    alert("Page is loaded");
-}
-  	</script>
-  <style>
-  myHero {
-      display: block;
-      background-color: #dddddd;
-      padding: 50px;
-      font-size: 30px;
-  } 
-  body {
-    font-family: "Lato", sans-serif;
-}
-
-.sidenav {
-    height: 100%;
-    width: 250px;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    background-color: #111;
-    overflow-x: hidden;
-    transition: 0.5s;
-    padding-top: 60px;
-}
-
-.sidenav a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 20px;
-    color: #818181;
-    display: block;
-    transition: 0.3s
-}
-
-.sidenav a:hover, .offcanvas a:focus{
-    color: #f1f1f1;
-}
-
-.main {
-    margin-left: 250px;
-}
-.button {
-    background-color: #4CAF50; /* Green */
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-     position:relative;
-    top:0%; 
-    left:25%;
-}
-.button2 {background-color: #008CBA;} /* Blue */
-  </style> 
-</head>
-<!-- <body> -->
-<body onload="selectDB()">
-<div id="mySidenav" class="sidenav">
- <a>Database</a>
-  <a>database :</a>
-  <!-- <input type="radio" class="query" name="database" value="world" onchange="selectDB()">world -->
-  <!-- <div id="buildcheckbox"></div> -->
-<form >
- <a> <input type="radio" class="databaseName" name="database" value="world" onchange="selectDB()" checked="checked">world</a>
-
- <a> <input type="radio" class="databaseName" name="database" value="school" onchange="selectDB()">school</a>
-</form> 
- 
-  <div id = "buildchoiceTable" >
-  
-  </div>
-  <input class="button button2" type="submit" value="Submit" onclick="submit()">
-
-</div>
-
-<div  class="main" style="marginLeft:250px;">
-<h1>DATABASE 2/2559</h1>
-<div><div id="buildTable"></div></div>
-<!-- <button class="button button2" onclick="query()">Query</button> <!--param id=8 table=1  -->
-</div>
-
-
-</body>
-</html>
+			<div class="wrapper row1">
+			  <header id="header" class="clear">
+			    <div id="hgroup">
+			      <h1><a href="#">Web Database System</a></h1>
+			      <h2>Demo version</h2>
+			    </div>
+				</header>
+			</div>
+			<table>
+				<tr>
+					<td style="width:15%;">
+							<div class="menu" tabindex="0">
+								<ul>
+							    <li><span>Create Database</span></li>
+									<li><span>Button</span></li>
+									<li><span>Button</span></li>
+									<li><span>Button</span></li>
+							  </ul>
+							</div>
+					</td>
+					<td style="width:70%;">
+						<table style="width:100%; margin-top:-20%;">
+							<tr>
+								<td colspan="4">
+									<div class="bar">
+												<p style="text-align:center;">Select Database</p>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td style="width:20%;">
+									<div class="card">
+											<div class="container">
+												<p><a href="http://localhost:3000/showData">World</a></p>
+											</div>
+									</div>
+								</td>
+								<td style="width:20%;">
+									<div class="card">
+											<div class="container">
+												<p>School</p>
+											</div>
+									</div>
+								</td>
+								<td  style="width:20%;" >
+									<div class="card">
+											<div class="container">
+												<p>Architect & Engineer</p>
+											</div>
+									</div>
+								</td>
+								<td  style="width:20%;" >
+									<div class="card">
+											<div class="container">
+												<p>Architect & Engineer</p>
+											</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</td>
+			</tr>
+		</table>
+	 </body>
+	</html>
